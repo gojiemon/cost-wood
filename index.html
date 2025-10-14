@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>原価アプリ（MVP）</title>
+    <!-- Tailwind CDN（JIT） -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React 18 UMD + ReactDOM 18 UMD -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel Standalone（ブラウザでJSXを変換） -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body class="bg-neutral-50">
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="env,react">
+      // ===== ここからあなたのアプリ（import/export なし版） =====
+      const { useEffect, useMemo, useState } = React;
+
+      const uid = () => Math.random().toString(36).slice(2);
+      const rY = (v) => Math.round(v);
+
+      function usePersistentState(key, initial) {
+        const [state, setState] = useState(() => {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) return JSON.parse(raw);
+          } catch {}
+          return initial;
+        });
+        useEffect(() => {
+          localStorage.setItem(key, JSON.stringify(state));
+        }, [key, state]);
+        return [state, setState];
+      }
+
+      const EDIBLE_FIXED = {
+        "いちご": 0.9,
+        "ぶどう": 0.87,
+        "シャインマスカット": 0.87,
+        "巨峰": 0.87,
+        "クイーンルージュ": 0.87,
+        "クイーンニーナ": 0.87,
+        "ナガノパープル": 0.87,
+        "ブルーベリー": 0.98,
+        "ブラックベリー": 0.9,
+        "チェリー": 0.95,
+        "アメリカンチェリー": 0.95,
+        "もも": 0.93,
+        "桃": 0.93,
+        "ネクタリン": 0.95,
+        "メロン": 0.6,
+        "レモン": 0.45,
+        "梨": 0.9,
+        "カシス": 0.98,
+        "マスカルポーネ": 1.0,
+        "クリームチーズ": 1.0
+      };
+
+      const initialIngredients = [
+        { id: "granola", name: "グラノーラ", category: "granola", pricePerKg: 1921 },
+        { id: "whip", name: "ホイップ", category: "cream", pricePerKg: 871 }
+      ];
+
+      const shippingPerKg = (f) =>
+        (f.shippingCostTotal && f.shipmentWeightKg)
+          ? rY(f.shippingCostTotal / f.shipmentWeightKg)
+          : 0;
+
+      const effectivePricePerKg = (f) =>
+        (f.contractPricePerKg || 0) + shippingPerKg(f);
+
+      const edibleEffPerKg = (f) => {
+        const ratio = f.edibleRatio ?? EDIBLE_FIXED[f.fruitName] ?? 1;
+        const eff = effectivePricePerKg(f);
+        return rY(eff / (ratio > 0 ? ratio : 1));
+      };
+
+      const basePerG = (b) =>
+        b.lines.reduce((s, l) => s + (l.pricePerKg / 1000) * l.qtyG, 0) /
+        (b.finishedWeightG || 1);
+
+      const initialBases = [
+        {
+          id: uid(),
+          name: "フローズンヨーグルト",
+          finishedWeightG: 2872.088,
+          lines: [
+            { id: uid(), name: "蜂蜜", pricePerKg: 1375, qtyG: 42 },
+            { id: uid(), name: "粉乳", pricePerKg: 1097, qtyG: 126, isYogurtComponent: true },
+            { id: uid(), name: "甘み成分", pricePerKg: 1079, qtyG: 730 },
+            { id: uid(), name: "牛乳", pricePerKg: 209, qtyG: 1974, isYogurtComponent: true },
+            { id: uid(), name: "乳酸菌", pricePerKg: 252000, qtyG: 0.088, isYogurtComponent: true }
+          ]
+        },
+        { id: uid(), name: "ヨーグルト", finishedWeightG: 2100.088, lines: [] },
+        { id: uid(), name: "ギリシャヨーグルト", finishedWeightG: 1000, lines: [] }
+      ];
+
+      const initialFruits = [
+        { id: uid(), supplier: "沢田商事", fruitName: "ブラックベリー", contractPricePerKg: 1350, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["ブラックベリー"] },
+        { id: uid(), supplier: "", fruitName: "八ヶ岳ブルーベリー", contractPricePerKg: 1500, shippingCostTotal: 1500, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["ブルーベリー"] },
+        { id: uid(), supplier: "沢田商事", fruitName: "クランベリー", contractPricePerKg: 1340, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: 0.98 },
+        { id: uid(), supplier: "駒ヶ根いちご園", fruitName: "いちご", variety: "紅ほっぺ", contractPricePerKg: 1200, shippingCostTotal: 1200, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["いちご"] },
+        { id: uid(), supplier: "369FARM", fruitName: "さぶのレモン", contractPricePerKg: 1000, shippingCostTotal: 1431, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["レモン"] },
+        { id: uid(), supplier: "弘前倉庫", fruitName: "弘前カシス", contractPricePerKg: 1458, shippingCostTotal: 1580, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["カシス"] },
+        { id: uid(), supplier: "駒ヶ根いちご園", fruitName: "生いちご", variety: "紅ほっぺ", contractPricePerKg: 1600, shippingCostTotal: 1500, shipmentWeightKg: 4.8, edibleRatio: EDIBLE_FIXED["いちご"] },
+        { id: uid(), supplier: "沢田商事", fruitName: "アメリカンチェリー", contractPricePerKg: 1750, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["アメリカンチェリー"] },
+        { id: uid(), supplier: "ウエムラメロンファーム", fruitName: "タカミメロン", contractPricePerKg: 500, shippingCostTotal: 1606, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["メロン"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 2125, shippingCostTotal: 2500, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "クイーンルージュ", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["クイーンルージュ"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "ナガノパープル", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["ナガノパープル"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "クイーンニーナ", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["クイーンニーナ"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "シャインマスカット", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["シャインマスカット"] },
+        { id: uid(), supplier: "一実屋", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 1000, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "一実屋", fruitName: "桃", contractPricePerKg: 1142, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["桃"] },
+        { id: uid(), supplier: "フルーツ工房タンザワ", fruitName: "ネクタリン", contractPricePerKg: 1400, shippingCostTotal: 1000, shipmentWeightKg: 5, edibleRatio: EDIBLE_FIXED["ネクタリン"] },
+        { id: uid(), supplier: "小野農園", fruitName: "ぶどう", variety: "BKシードレス", contractPricePerKg: 1400, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["ぶどう"] },
+        { id: uid(), supplier: "小野農園", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 1000, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "中沢乳業", fruitName: "マスカルポーネ", contractPricePerKg: 2580, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["マスカルポーネ"] },
+        { id: uid(), supplier: "フィラデルフィア", fruitName: "クリームチーズ", contractPricePerKg: 1430, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["クリームチーズ"] }
+      ];
+
+      function Card({ title, value, subtitle }) {
+        return (
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            <div className="text-xs opacity-70">{title}</div>
+            <div className="text-xl font-bold mt-1">{value}</div>
+            {subtitle && <div className="text-xs opacity-60 mt-1">{subtitle}</div>}
+          </div>
+        );
+      }
+
+      function FruitList({ fruits, setFruits, includeShipping }) {
+        const [q, setQ] = useState("");
+        const [open, setOpen] = useState(false);
+        const [editing, setEditing] = useState(null);
+        const [form, setForm] = useState({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" });
+        const list = fruits.filter((f) => `${f.supplier} ${f.fruitName} ${f.variety ?? ""}`.includes(q));
+        const toNum = (s) => { const v = Number(s); return isFinite(v) ? v : undefined; };
+        const openNew = () => { setEditing(null); setForm({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" }); setOpen(true); };
+        const openEdit = (f) => { setEditing(f); setForm({ supplier: f.supplier || "", fruitName: f.fruitName || "", variety: f.variety || "", contract: String(f.contractPricePerKg ?? ""), shipTotal: String(f.shippingCostTotal ?? ""), shipKg: String(f.shipmentWeightKg ?? ""), edible: String(f.edibleRatio ?? "") }); setOpen(true); };
+        const save = () => {
+          const patch = {
+            id: editing?.id ?? uid(),
+            supplier: form.supplier.trim(),
+            fruitName: form.fruitName.trim(),
+            variety: form.variety.trim() || undefined,
+            contractPricePerKg: Number(form.contract || 0),
+            shippingCostTotal: toNum(form.shipTotal),
+            shipmentWeightKg: toNum(form.shipKg),
+            edibleRatio: toNum(form.edible) ?? (EDIBLE_FIXED[form.fruitName] ?? 1)
+          };
+          if (editing) {
+            setFruits(fruits.map((x) => (x.id === editing.id ? { ...x, ...patch } : x)));
+          } else {
+            setFruits([patch, ...fruits]);
+          }
+          setOpen(false);
+        };
+        const removeItem = () => { if (!editing) return; setFruits(fruits.filter((x) => x.id !== editing.id)); setOpen(false); };
+
+        return (
+          <div className="px-4 pb-10">
+            <div className="mb-2 flex items-center gap-2">
+              <input className="border rounded-xl p-2 w-full" placeholder="農家/果物/品種で検索" value={q} onChange={(e) => setQ(e.target.value)} />
+              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">新規追加</button>
+            </div>
+            <div className="space-y-2">
+              {list.map((f) => {
+                const effKg = (f.contractPricePerKg || 0) + (includeShipping ? shippingPerKg(f) : 0);
+                const edibleKg = rY(effKg / ((f.edibleRatio && f.edibleRatio > 0) ? f.edibleRatio : 1));
+                return (
+                  <div key={f.id} className="bg-white rounded-2xl p-3 shadow-sm">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="font-semibold">{f.supplier ? `${f.supplier}｜` : ""}{f.fruitName}{f.variety ? `（${f.variety}）` : ""}</div>
+                        <div className="text-sm mt-1"><span className="font-medium">実質 ¥/kg（可食適用）：</span><span className="font-extrabold">￥{edibleKg.toLocaleString()}</span></div>
+                        <div className="text-xs opacity-70 mt-1">契約￥{(f.contractPricePerKg || 0).toLocaleString()} /kg｜送料￥{includeShipping ? shippingPerKg(f) : 0} /kg｜可食 {f.edibleRatio ?? 1}</div>
+                        <div className="text-xs opacity-70">1g（可食適用）：￥{rY(edibleKg / 1000)}</div>
+                      </div>
+                      <button onClick={() => openEdit(f)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "果物を編集" : "果物を追加"}>
+              <div className="grid gap-2 text-sm">
+                <label>仕入先<input className="border rounded-xl p-2 w-full" value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} /></label>
+                <label>果物名<input className="border rounded-xl p-2 w-full" value={form.fruitName} onChange={(e) => setForm({ ...form, fruitName: e.target.value })} /></label>
+                <label>品種（任意）<input className="border rounded-xl p-2 w-full" value={form.variety} onChange={(e) => setForm({ ...form, variety: e.target.value })} /></label>
+                <label>契約価格(円/kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.contract} onChange={(e) => setForm({ ...form, contract: e.target.value })} /></label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label>送料総額(円)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipTotal} onChange={(e) => setForm({ ...form, shipTotal: e.target.value })} /></label>
+                  <label>配送重量(kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipKg} onChange={(e) => setForm({ ...form, shipKg: e.target.value })} /></label>
+                </div>
+                <label>可食部率(0〜1)<input type="number" step="0.01" className="border rounded-xl p-2 w-full" value={form.edible} onChange={(e) => setForm({ ...form, edible: e.target.value })} /></label>
+                <div className="flex justify-between items-center gap-2 mt-2">
+                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">削除</button>}
+                  <div className="ml-auto flex gap-2">
+                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+          </div>
+        );
+      }
+
+      function BaseEditor({ bases, setBases, fyKg }) {
+        const fy = bases.find((b) => b.name === "フローズンヨーグルト");
+        const updateLine = (id, patch) => {
+          const next = { ...fy, lines: fy.lines.map((l) => (l.id === id ? { ...l, ...patch } : l)) };
+          setBases(bases.map((b) => (b.id === fy.id ? next : b)));
+        };
+        const add = () => {
+          const name = prompt("材料名");
+          if (!name) return;
+          const price = Number(prompt("単価(円/kg)", "0") || 0);
+          const qty = Number(prompt("数量(g)", "0") || 0);
+          const yo = confirm("ヨーグルト成分に含める？");
+          const next = { ...fy, lines: [...fy.lines, { id: uid(), name, pricePerKg: price, qtyG: qty, isYogurtComponent: yo }] };
+          setBases(bases.map((b) => (b.id === fy.id ? next : b)));
+        };
+        const del = (id) => {
+          const next = { ...fy, lines: fy.lines.filter((l) => l.id !== id) };
+          setBases(bases.map((b) => (b.id === fy.id ? next : b)));
+        };
+
+        return (
+          <div className="px-4 pb-10">
+            <div className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-semibold">FY配合（¥/kg：￥{fyKg.toLocaleString()}）</div>
+                <button onClick={add} className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-sm">行追加</button>
+              </div>
+              <div className="space-y-2">
+                {fy.lines.map((l) => (
+                  <div key={l.id} className="grid grid-cols-10 gap-2 items-center">
+                    <input className="col-span-3 border rounded-xl p-2" value={l.name} onChange={(e) => updateLine(l.id, { name: e.target.value })} />
+                    <input type="number" className="col-span-2 border rounded-xl p-2" value={l.pricePerKg} onChange={(e) => updateLine(l.id, { pricePerKg: Number(e.target.value) })} />
+                    <input type="number" className="col-span-2 border rounded-xl p-2" value={l.qtyG} onChange={(e) => updateLine(l.id, { qtyG: Number(e.target.value) })} />
+                    <label className="col-span-2 text-sm flex items-center gap-2">
+                      <input type="checkbox" checked={!!l.isYogurtComponent} onChange={(e) => updateLine(l.id, { isYogurtComponent: e.target.checked })} />
+                      ヨーグルト成分
+                    </label>
+                    <button className="col-span-1 text-sm text-red-600" onClick={() => del(l.id)}>削除</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function MenuEditor({ fruits, fyPerG, ingredients, items, setItems, cat, setCat }) {
+        const [open, setOpen] = useState(false);
+        const [name, setName] = useState("");
+        const [menuEditOpen, setMenuEditOpen] = useState(false);
+        const [menuEditing, setMenuEditing] = useState(null);
+        const [menuEditName, setMenuEditName] = useState("");
+
+        const create = () => {
+          if (!name) return;
+          const id = uid();
+          const lines = cat === "生のせシリーズ"
+            ? [{ id: uid(), type: "fruit", qtyG: 60 }, { id: uid(), type: "base", qtyG: 100 }]
+            : [];
+          setItems([...items, { id, name, category: cat, lines }]);
+          setName("");
+          setOpen(false);
+        };
+
+        const UnifiedDD = ({ value, onChange }) => {
+          const selected = value || "";
+          return (
+            <select className="border rounded-xl p-2 w-full" value={selected} onChange={(e) => onChange(e.target.value)}>
+              <option value="">材料を選択</option>
+              <optgroup label="果物">
+                {fruits.map((f) => (
+                  <option key={"f:" + f.id} value={"f:" + f.id}>
+                    {`${f.supplier ? f.supplier + "｜" : ""}${f.fruitName}${f.variety ? `（${f.variety}）` : ""}`}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="その他">
+                {ingredients.map((i) => (
+                  <option key={"i:" + i.id} value={"i:" + i.id}>
+                    {`${i.name}（￥${i.pricePerKg}/kg）`}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          );
+        };
+
+        const perG = (f) => edibleEffPerKg(f) / 1000;
+
+        const lineCost = (l) => {
+          if (l.type === "base") return rY(fyPerG * (l.qtyG || 0));
+          if (l.type === "fruit") {
+            const f = fruits.find((z) => z.id === l.refId);
+            if (!f) return 0;
+            return rY(perG(f) * (l.qtyG || 0));
+          }
+          const ing = ingredients.find((z) => z.id === l.refId);
+          if (!ing) return 0;
+          return rY((ing.pricePerKg / 1000) * (l.qtyG || 0));
+        };
+
+        const menuCost = (m) => rY(m.lines.reduce((s, l) => s + lineCost(l), 0));
+
+        const addTypedLine = (m) => {
+          const type = (prompt("行タイプ（fruit / base / ingredient / sauce / cream / granola / topping / container）", "fruit") || "fruit");
+          const qty = Number(prompt("数量[g]", "0") || 0);
+          const newLine = { id: uid(), type, qtyG: qty };
+          setItems(items.map((x) => (x.id === m.id ? { ...x, lines: [...x.lines, newLine] } : x)));
+        };
+
+        const composedValue = (l) => {
+          if (!l.refId) return "";
+          if (l.type === "fruit") return "f:" + l.refId;
+          if (l.type === "base") return "";
+          return "i:" + l.refId;
+        };
+
+        const handleSelectChange = (m, l, val) => {
+          if (!val) {
+            setItems(items.map((x) => (x.id === m.id ? { ...x, lines: x.lines.map((a) => (a.id === l.id ? { ...a, refId: undefined } : a)) } : x)));
+            return;
+          }
+          const [prefix, id] = val.split(":");
+          const next = items.map((x) =>
+            x.id === m.id
+              ? {
+                  ...x,
+                  lines: x.lines.map((a) =>
+                    a.id === l.id ? { ...a, refId: id, type: prefix === "f" ? "fruit" : a.type === "base" ? "base" : "ingredient" } : a
+                  )
+                }
+              : x
+          );
+          setItems(next);
+        };
+
+        const openEditMenu = (m) => { setMenuEditing(m); setMenuEditName(m.name); setMenuEditOpen(true); };
+        const saveEditMenu = () => { if (!menuEditing) return; setItems(items.map((x) => (x.id === menuEditing.id ? { ...x, name: menuEditName } : x))); setMenuEditOpen(false); };
+        const removeMenu = (m) => { setItems(items.filter((x) => x.id !== m.id)); };
+
+        return (
+          <div className="px-4 pb-16">
+            <div className="flex gap-2 mb-3">
+              {["パフェ", "生のせシリーズ", "フルーツサンド"].map((t) => (
+                <button key={t} onClick={() => setCat(t)} className={`px-3 py-2 rounded-xl text-sm shadow-sm ${cat === t ? "bg-emerald-600 text-white" : "bg-white"}`}>{t}</button>
+              ))}
+              <button onClick={() => setOpen(true)} className="ml-auto px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">{cat}を追加</button>
+            </div>
+
+            {items.filter((x) => x.category === cat).map((m) => (
+              <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">{m.name}</div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => openEditMenu(m)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
+                    <button onClick={() => removeMenu(m)} className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm">削除</button>
+                  </div>
+                </div>
+                <div className="mt-2 text-sm">1個原価：<b>￥{menuCost(m).toLocaleString()}</b></div>
+
+                <div className="mt-3 space-y-2">
+                  {m.lines.map((l) => (
+                    <div key={l.id} className="grid grid-cols-12 gap-2 items-center">
+                      <div className="col-span-4">
+                        {l.type === "base"
+                          ? (<div className="text-sm opacity-70">FY</div>)
+                          : (<UnifiedDD value={composedValue(l)} onChange={(v) => handleSelectChange(m, l, v)} />)}
+                      </div>
+                      <div className="col-span-2">
+                        <input
+                          type="number"
+                          className="border rounded-xl p-2 w-full"
+                          value={l.qtyG}
+                          onChange={(e) =>
+                            setItems(items.map((x) =>
+                              x.id === m.id
+                                ? { ...x, lines: x.lines.map((a) => (a.id === l.id ? { ...a, qtyG: Number(e.target.value) } : a)) }
+                                : x
+                            ))
+                          }
+                        />
+                      </div>
+                      <div className="col-span-3 text-right text-sm">￥{rY(lineCost(l)).toLocaleString()}</div>
+                      <div className="col-span-2 text-sm opacity-70">{l.type}</div>
+                      <div className="col-span-1 text-right">
+                        <button
+                          className="text-red-600 text-sm"
+                          onClick={() =>
+                            setItems(items.map((x) =>
+                              x.id === m.id
+                                ? { ...x, lines: x.lines.filter((a) => a.id !== l.id) }
+                                : x
+                            ))
+                          }
+                        >
+                          削除
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-3">
+                  <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">行追加</button>
+                </div>
+              </div>
+            ))}
+
+            <Modal open={open} onClose={() => setOpen(false)} title={`${cat}を追加`}>
+              <div className="grid gap-2">
+                <label className="text-sm">メニュー名
+                  <input className="border rounded-xl p-2 w-full" value={name} onChange={(e) => setName(e.target.value)} />
+                </label>
+                <div className="flex justify-end gap-2 mt-3">
+                  <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                  <button onClick={create} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">作成</button>
+                </div>
+              </div>
+            </Modal>
+
+            <Modal open={menuEditOpen} onClose={() => setMenuEditOpen(false)} title="メニュー名を編集">
+              <div className="grid gap-2">
+                <input className="border rounded-xl p-2 w-full" value={menuEditName} onChange={(e) => setMenuEditName(e.target.value)} />
+                <div className="flex justify-end gap-2 mt-3">
+                  <button onClick={() => setMenuEditOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                  <button onClick={saveEditMenu} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
+                </div>
+              </div>
+            </Modal>
+          </div>
+        );
+      }
+
+      function IngredientManager({ ingredients, setIngredients }) {
+        const [q, setQ] = useState("");
+        const [open, setOpen] = useState(false);
+        const [editing, setEditing] = useState(null);
+        const [form, setForm] = useState({ name: "", category: "ingredient", price: "" });
+        const list = ingredients.filter((i) => `${i.name} ${i.category}`.includes(q));
+        const openNew = () => { setEditing(null); setForm({ name: "", category: "ingredient", price: "" }); setOpen(true); };
+        const openEdit = (i) => { setEditing(i); setForm({ name: i.name, category: i.category, price: String(i.pricePerKg) }); setOpen(true); };
+        const save = () => {
+          const patch = { id: editing?.id ?? uid(), name: form.name.trim(), category: form.category.trim() || "ingredient", pricePerKg: Number(form.price || 0) };
+          if (editing) {
+            setIngredients(ingredients.map((x) => (x.id === editing.id ? { ...x, ...patch } : x)));
+          } else {
+            setIngredients([patch, ...ingredients]);
+          }
+          setOpen(false);
+        };
+        const removeItem = () => { if (!editing) return; setIngredients(ingredients.filter((x) => x.id !== editing.id)); setOpen(false); };
+
+        return (
+          <div className="px-4 pb-16">
+            <div className="mb-2 flex items-center gap-2">
+              <input className="border rounded-xl p-2 w-full" placeholder="材料名/カテゴリで検索" value={q} onChange={(e) => setQ(e.target.value)} />
+              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">新規追加</button>
+            </div>
+            <div className="space-y-2">
+              {list.map((i) => (
+                <div key={i.id} className="bg-white rounded-2xl p-3 shadow-sm">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="font-semibold">{i.name}</div>
+                      <div className="text-xs opacity-70 mt-1">カテゴリ: {i.category}｜¥/kg: ￥{i.pricePerKg}</div>
+                    </div>
+                    <button onClick={() => openEdit(i)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "材料を編集" : "材料を追加"}>
+              <div className="grid gap-2 text-sm">
+                <label>材料名<input className="border rounded-xl p-2 w-full" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
+                <label>カテゴリ
+                  <select className="border rounded-xl p-2 w-full" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                    <option value="ingredient">ingredient</option>
+                    <option value="sauce">sauce</option>
+                    <option value="cream">cream</option>
+                    <option value="granola">granola</option>
+                    <option value="topping">topping</option>
+                    <option value="container">container</option>
+                  </select>
+                </label>
+                <label>価格(円/kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
+                <div className="flex justify-between items-center gap-2 mt-2">
+                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">削除</button>}
+                  <div className="ml-auto flex gap-2">
+                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+          </div>
+        );
+      }
+
+      function Settings({ includeShipping, setIncludeShipping }) {
+        return (
+          <div className="px-4 pb-16">
+            <div className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="font-semibold mb-2">表示と計算</div>
+              <div className="flex items-center gap-4 text-sm">
+                <label className="inline-flex items-center gap-2">
+                  <input type="checkbox" checked={includeShipping} onChange={(e) => setIncludeShipping(e.target.checked)} />
+                  送料込み（一覧・計算）
+                </label>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function Modal({ open, onClose, title, children }) {
+        if (!open) return null;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+            <div className="relative bg-white rounded-2xl shadow-lg w-[92%] max-w-md p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-semibold">{title}</div>
+                <button onClick={onClose} className="text-sm opacity-70">閉じる</button>
+              </div>
+              {children}
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [tab, setTab] = usePersistentState("tab", "果物");
+        const [fruits, setFruits] = usePersistentState("fruits", initialFruits);
+        const [bases, setBases] = usePersistentState("bases", initialBases);
+        const [includeShipping, setIncludeShipping] = usePersistentState("includeShipping", true);
+        const [ingredients, setIngredients] = usePersistentState("ingredients", initialIngredients);
+        const [items, setItems] = usePersistentState("menus", []);
+        const [cat, setCat] = usePersistentState("menuCat", "生のせシリーズ");
+
+        const fy = bases.find((b) => b.name === "フローズンヨーグルト");
+        const fyG = useMemo(() => basePerG(fy), [fy]);
+        const fyKg = rY(fyG * 1000);
+
+        return (
+          <div className="min-h-screen bg-neutral-50 text-neutral-900">
+            <div className="p-4 pb-2">
+              <div className="flex items-center justify-between">
+                <div className="text-xl font-semibold">原価アプリ（MVP）</div>
+                <div className="text-sm opacity-70">税抜・四捨五入 / 可食=固定適用</div>
+              </div>
+            </div>
+
+            <div className="px-4 mb-3 flex gap-2 flex-wrap">
+              {["果物", "ベース", "メニュー", "その他", "設定"].map((t) => (
+                <button key={t} onClick={() => setTab(t)} className={`px-3 py-2 rounded-xl text-sm shadow-sm ${tab === t ? "bg-emerald-600 text-white" : "bg-white"}`}>{t}</button>
+              ))}
+            </div>
+
+            {tab === "果物" && <FruitList fruits={fruits} setFruits={setFruits} includeShipping={includeShipping} />}
+            {tab === "ベース" && <BaseEditor bases={bases} setBases={setBases} fyKg={fyKg} />}
+            {tab === "メニュー" && <MenuEditor fruits={fruits} fyPerG={fyG} ingredients={ingredients} items={items} setItems={setItems} cat={cat} setCat={setCat} />}
+            {tab === "その他" && <IngredientManager ingredients={ingredients} setIngredients={setIngredients} />}
+            {tab === "設定" && <Settings includeShipping={includeShipping} setIncludeShipping={setIncludeShipping} />}
+          </div>
+        );
+      }
+
+      // React 18 の createRoot でマウント
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+      // ===== ここまで =====
+    </script>
+  </body>
+</html>
