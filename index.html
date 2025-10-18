@@ -11,6 +11,9 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <!-- Babel Standalone（ブラウザでJSXを変換） -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .fruit-card .font-medium { display: none; }
+    </style>
   </head>
   <body class="bg-neutral-50">
     <div id="root"></div>
@@ -133,13 +136,40 @@
         );
       }
 
-      function FruitList({ fruits, setFruits, includeShipping }) {
+      function FruitList({ fruits, setFruits, includeShipping, fyPerG }) {
         const [q, setQ] = useState("");
         const [open, setOpen] = useState(false);
         const [editing, setEditing] = useState(null);
         const [form, setForm] = useState({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" });
         const list = fruits.filter((f) => `${f.supplier} ${f.fruitName} ${f.variety ?? ""}`.includes(q));
         const toNum = (s) => { const v = Number(s); return isFinite(v) ? v : undefined; };
+        // 既定ブレンド量（Sサイズ時の果物g）
+        const blendDefault = (f) => {
+          const name = f?.fruitName || "";
+          const variety = f?.variety || "";
+          if (name.includes("八ヶ岳ブルーベリー")) return 33;
+          if (name.includes("クランベリー")) return 20;
+          if (name.includes("アメリカンチェリー")) return 40;
+          if (name.includes("タカミメロン")) return 37;
+          if (name.includes("ネクタリン")) return 37;
+          if (name.includes("レモン")) return 15;
+          if (name.includes("弘前カシス") || name.includes("カシス")) return 15;
+          if (name.includes("マスカルポ")) return 20;
+          if (name.includes("クリームチ")) return 17;
+          if (name.includes("もも") || name.includes("桃")) return 40;
+          if (
+            name.includes("ぶど") ||
+            variety.includes("巨峰") || name.includes("巨峰") ||
+            variety.includes("シャイン") || name.includes("シャイン") ||
+            variety.includes("ナガノ") || name.includes("ナガノ") ||
+            variety.includes("クイーン") || name.includes("クイーン")
+          ) return 40;
+          // ブラックベリー系（ブルー/クラン/カシス除外）
+          if (name.includes("ベリー") && !name.includes("ブルー") && !name.includes("クラン") && !name.includes("カシス")) return 30;
+          // いちご系
+          if (name.includes("いち") || name.includes("苺")) return 35;
+          return undefined;
+        };
         const openNew = () => { setEditing(null); setForm({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" }); setOpen(true); };
         const openEdit = (f) => { setEditing(f); setForm({ supplier: f.supplier || "", fruitName: f.fruitName || "", variety: f.variety || "", contract: String(f.contractPricePerKg ?? ""), shipTotal: String(f.shippingCostTotal ?? ""), shipKg: String(f.shipmentWeightKg ?? ""), edible: String(f.edibleRatio ?? "") }); setOpen(true); };
         const save = () => {
@@ -172,14 +202,22 @@
               {list.map((f) => {
                 const effKg = (f.contractPricePerKg || 0) + (includeShipping ? shippingPerKg(f) : 0);
                 const edibleKg = rY(effKg / ((f.edibleRatio && f.edibleRatio > 0) ? f.edibleRatio : 1));
+                const fruitBlendG = (f.blendFruitG ?? blendDefault(f) ?? 35);
+                const fyBlendG = Math.max(0, 100 - fruitBlendG);
+                const sCost = rY((edibleKg / 1000) * fruitBlendG + (fyPerG || 0) * fyBlendG);
+                const mCost = rY(1.4 * ((edibleKg / 1000) * fruitBlendG + (fyPerG || 0) * fyBlendG));
                 return (
-                  <div key={f.id} className="bg-white rounded-2xl p-3 shadow-sm">
+                    <div key={f.id} className="bg-white rounded-2xl p-3 shadow-sm fruit-card">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="font-semibold">{f.supplier ? `${f.supplier}｜` : ""}{f.fruitName}{f.variety ? `（${f.variety}）` : ""}</div>
-                        <div className="text-sm mt-1"><span className="font-medium">実質 ¥/kg（可食適用）：</span><span className="font-extrabold">￥{edibleKg.toLocaleString()}</span></div>
+                        <div className="text-sm mt-1">
+                          <span className="font-medium">実質 ¥/kg（可食適用）：</span>
+                          <span className="font-extrabold">￥{edibleKg.toLocaleString()}</span>
+                          <span className="ml-3 text-xs opacity-70">FYフレーバー S:￥{sCost.toLocaleString()} / M:￥{mCost.toLocaleString()}</span>
+                        </div>
                         <div className="text-xs opacity-70 mt-1">契約￥{(f.contractPricePerKg || 0).toLocaleString()} /kg｜送料￥{includeShipping ? shippingPerKg(f) : 0} /kg｜可食 {f.edibleRatio ?? 1}</div>
-                        <div className="text-xs opacity-70">1g（可食適用）：￥{rY(edibleKg / 1000)}</div>
+                        {/* 1g（可食適用）表示は非表示にしました */}
                       </div>
                       <button onClick={() => openEdit(f)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
                     </div>
@@ -232,6 +270,18 @@
           setBases(bases.map((b) => (b.id === fy.id ? next : b)));
         };
 
+        // ヨーグルト成分のみの原価（kgあたり）
+        const yogurtCostTotal = (fy?.lines || []).reduce(
+          (sum, l) => sum + (l.isYogurtComponent ? (l.pricePerKg / 1000) * (l.qtyG || 0) : 0),
+          0
+        );
+        const yogurtWeightG = (fy?.lines || []).reduce(
+          (sum, l) => sum + (l.isYogurtComponent ? (l.qtyG || 0) : 0),
+          0
+        );
+        const yogurtPerG = yogurtWeightG > 0 ? yogurtCostTotal / yogurtWeightG : 0;
+        const yogurtKg = rY(yogurtPerG * 1000);
+
         return (
           <div className="px-4 pb-10">
             <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -239,6 +289,7 @@
                 <div className="font-semibold">FY配合（¥/kg：￥{fyKg.toLocaleString()}）</div>
                 <button onClick={add} className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-sm">行追加</button>
               </div>
+              <div className="text-sm text-neutral-600 mb-2">ヨーグルト成分 ¥/kg ￥{yogurtKg.toLocaleString()}</div>
               <div className="space-y-2">
                 {fy.lines.map((l) => (
                   <div key={l.id} className="grid grid-cols-10 gap-2 items-center">
@@ -571,7 +622,7 @@
               ))}
             </div>
 
-            {tab === "果物" && <FruitList fruits={fruits} setFruits={setFruits} includeShipping={includeShipping} />}
+            {tab === "果物" && <FruitList fruits={fruits} setFruits={setFruits} includeShipping={includeShipping} fyPerG={fyG} />}
             {tab === "ベース" && <BaseEditor bases={bases} setBases={setBases} fyKg={fyKg} />}
             {tab === "メニュー" && <MenuEditor fruits={fruits} fyPerG={fyG} ingredients={ingredients} items={items} setItems={setItems} cat={cat} setCat={setCat} />}
             {tab === "その他" && <IngredientManager ingredients={ingredients} setIngredients={setIngredients} />}
