@@ -315,6 +315,8 @@
         const [menuEditOpen, setMenuEditOpen] = useState(false);
         const [menuEditing, setMenuEditing] = useState(null);
         const [menuEditName, setMenuEditName] = useState("");
+        // Only one menu is actively edited at a time
+        const [editingMenuId, setEditingMenuId] = useState(null);
 
         const create = () => {
           if (!name) return;
@@ -412,11 +414,13 @@
           // Open new menu dialog so user continues with a fresh item
           setOpen(true);
           setName("");
+          setEditingMenuId(null);
         };
 
         // Resume editing a saved menu (unsave and enable inputs)
         const resumeEdit = (m) => {
           setItems(items.map((x) => (x.id === m.id ? { ...x, saved: false } : x)));
+          setEditingMenuId(m.id);
           setOpen(false);
         };
 
@@ -442,7 +446,7 @@
                 </div>
                 <div className="mt-2 text-sm">1個原価：<b>￥{menuCost(m).toLocaleString()}</b></div>
 
-                <div className="mt-3 space-y-2">
+                <div className={`mt-3 space-y-2 ${m.saved && editingMenuId !== m.id ? "hidden" : ""}`}>
                   {m.lines.map((l) => (
                     <div key={l.id} className="grid grid-cols-12 gap-2 items-center">
                       <div className="col-span-4">
@@ -487,7 +491,7 @@
                   ))}
                 </div>
 
-                <div className="mt-3 flex items-center gap-2">
+                <div className={`mt-3 flex items-center gap-2 ${m.saved && editingMenuId !== m.id ? "hidden" : ""}`}>
                   <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">行追加</button>
                   {!m.saved && (
                     <button onClick={() => markSaved(m)} className="px-3 py-1 bg-emerald-600 text-white rounded-xl text-sm">Save</button>
