@@ -403,6 +403,15 @@
         const saveEditMenu = () => { if (!menuEditing) return; setItems(items.map((x) => (x.id === menuEditing.id ? { ...x, name: menuEditName } : x))); setMenuEditOpen(false); };
         const removeMenu = (m) => { setItems(items.filter((x) => x.id !== m.id)); };
 
+        // English-only save to avoid mojibake in labels
+        const markSaved = (m) => {
+          const snapshot = menuCost(m);
+          const cleared = m.lines.map((l) => ({ ...l, qtyG: "" }));
+          setItems(items.map((x) => (
+            x.id === m.id ? { ...x, saved: true, savedAt: Date.now(), savedCost: snapshot, lines: cleared } : x
+          )));
+        };
+
         return (
           <div className="px-4 pb-16">
             <div className="flex gap-2 mb-3">
@@ -465,11 +474,36 @@
                   ))}
                 </div>
 
-                <div className="mt-3">
+                <div className="mt-3 flex items-center gap-2">
                   <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">行追加</button>
+                  {!m.saved && (
+                    <button onClick={() => markSaved(m)} className="px-3 py-1 bg-emerald-600 text-white rounded-xl text-sm">Save</button>
+                  )}
+                  {m.saved && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Saved</span>
+                  )}
                 </div>
               </div>
             ))}
+
+            {items.some((x) => x.category === cat && x.saved) && (
+              <div className="bg-white rounded-2xl p-4 shadow-sm mt-3">
+                <div className="font-semibold mb-2">Saved Menus</div>
+                <div className="space-y-1 text-sm">
+                  {items
+                    .filter((x) => x.category === cat && x.saved)
+                    .map((m) => (
+                      <div key={m.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">{m.name}</span>
+                          <span className="opacity-70">¥{(m.savedCost ?? menuCost(m)).toLocaleString()}</span>
+                          <span className="opacity-70">{m.lines.length} lines</span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
 
             <Modal open={open} onClose={() => setOpen(false)} title={`${cat}を追加`}>
               <div className="grid gap-2">
