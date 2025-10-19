@@ -325,6 +325,7 @@
             ? [{ id: uid(), type: "fruit", qtyG: 60 }, { id: uid(), type: "base", qtyG: 100 }]
             : [];
           setItems([...items, { id, name, category: cat, lines }]);
+          setEditingMenuId(id);
           setName("");
           setOpen(false);
         };
@@ -435,7 +436,7 @@
               <button onClick={() => setOpen(true)} className="ml-auto px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">{cat}を追加</button>
             </div>
 
-            {items.filter((x) => x.category === cat).map((m) => (
+            {items.filter((x) => x.category === cat && x.id === editingMenuId).map((m) => (
               <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div className="font-semibold">{m.name}</div>
