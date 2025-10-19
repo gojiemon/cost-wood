@@ -415,7 +415,7 @@
             {items.filter((x) => x.category === cat).map((m) => (
               <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold flex items-center gap-2">{m.name}{m.saved && (<span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">保存済み</span>)}</div>
+                  <div className="font-semibold">{m.name}</div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => openEditMenu(m)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
                     <button onClick={() => removeMenu(m)} className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm">削除</button>
@@ -465,27 +465,11 @@
                   ))}
                 </div>
 
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3">
                   <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">行追加</button>
-                  {!m.saved && (
-                    <button onClick={() => setItems(items.map((x) => (x.id === m.id ? { ...x, saved: true, savedAt: Date.now() } : x)))} className="px-3 py-1 bg-emerald-600 text-white rounded-xl text-sm">保存</button>
-                  )}
                 </div>
               </div>
             ))}
-
-            {items.some((x) => x.category === cat && x.saved) && (
-              <div className="bg-white rounded-2xl p-4 shadow-sm mt-3">
-                <div className="font-semibold mb-2">保存済み一覧</div>
-                <div className="flex flex-wrap gap-2 text-sm">
-                  {items
-                    .filter((x) => x.category === cat && x.saved)
-                    .map((m) => (
-                      <span key={m.id} className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">{m.name}</span>
-                    ))}
-                </div>
-              </div>
-            )}
 
             <Modal open={open} onClose={() => setOpen(false)} title={`${cat}を追加`}>
               <div className="grid gap-2">
