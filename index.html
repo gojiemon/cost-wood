@@ -403,6 +403,17 @@
         const saveEditMenu = () => { if (!menuEditing) return; setItems(items.map((x) => (x.id === menuEditing.id ? { ...x, name: menuEditName } : x))); setMenuEditOpen(false); };
         const removeMenu = (m) => { setItems(items.filter((x) => x.id !== m.id)); };
 
+        const markSaved = (m) => {
+          const snapshot = menuCost(m);
+          const cleared = m.lines.map((l) => ({ ...l, qtyG: "" }));
+          setItems(items.map((x) => (
+            x.id === m.id ? { ...x, saved: true, savedAt: Date.now(), savedCost: snapshot, lines: cleared } : x
+          )));
+          // Open new menu dialog so user continues with a fresh item
+          setOpen(true);
+          setName("");
+        };
+
         // English-only save to avoid mojibake in labels
         const markSaved = (m) => {
           const snapshot = menuCost(m);
@@ -445,6 +456,7 @@
                           type="number"
                           className="border rounded-xl p-2 w-full"
                           value={l.qtyG}
+                          disabled={m.saved}
                           onChange={(e) =>
                             setItems(items.map((x) =>
                               x.id === m.id
@@ -457,6 +469,7 @@
                       <div className="col-span-3 text-right text-sm">￥{rY(lineCost(l)).toLocaleString()}</div>
                       <div className="col-span-2 text-sm opacity-70">{l.type}</div>
                       <div className="col-span-1 text-right">
+                        {!m.saved && (
                         <button
                           className="text-red-600 text-sm"
                           onClick={() =>
@@ -469,6 +482,7 @@
                         >
                           削除
                         </button>
+                        )}
                       </div>
                     </div>
                   ))}
