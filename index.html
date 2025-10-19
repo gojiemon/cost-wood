@@ -414,14 +414,13 @@
           setName("");
         };
 
-        // English-only save to avoid mojibake in labels
-        const markSaved = (m) => {
-          const snapshot = menuCost(m);
-          const cleared = m.lines.map((l) => ({ ...l, qtyG: "" }));
-          setItems(items.map((x) => (
-            x.id === m.id ? { ...x, saved: true, savedAt: Date.now(), savedCost: snapshot, lines: cleared } : x
-          )));
+        // Resume editing a saved menu (unsave and enable inputs)
+        const resumeEdit = (m) => {
+          setItems(items.map((x) => (x.id === m.id ? { ...x, saved: false } : x)));
+          setOpen(false);
         };
+
+        
 
         return (
           <div className="px-4 pb-16">
@@ -512,6 +511,9 @@
                           <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">{m.name}</span>
                           <span className="opacity-70">¥{(m.savedCost ?? menuCost(m)).toLocaleString()}</span>
                           <span className="opacity-70">{m.lines.length} lines</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => resumeEdit(m)} className="px-2 py-1 bg-neutral-100 rounded-lg text-xs">Edit</button>
                         </div>
                       </div>
                     ))}
