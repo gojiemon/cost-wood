@@ -1,15 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>蜴滉ｾ｡繧｢繝励Μ・・VP・・/title>
-    <!-- Tailwind CDN・・IT・・-->
+    <title>原価アプリ（MVP）</title>
+    <!-- Tailwind CDN（JIT） -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React 18 UMD + ReactDOM 18 UMD -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel Standalone・医ヶ繝ｩ繧ｦ繧ｶ縺ｧJSX繧貞､画鋤・・-->
+    <!-- Babel Standalone（ブラウザでJSXを変換） -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
       .fruit-card .font-medium { display: none; }
@@ -19,7 +19,7 @@
     <div id="root"></div>
 
     <script type="text/babel" data-presets="env,react">
-      // ===== 縺薙％縺九ｉ縺ゅ↑縺溘・繧｢繝励Μ・・mport/export 縺ｪ縺礼沿・・=====
+      // ===== ここからあなたのアプリ（import/export なし版） =====
       const { useEffect, useMemo, useState } = React;
 
       const uid = () => Math.random().toString(36).slice(2);
@@ -40,31 +40,31 @@
       }
 
       const EDIBLE_FIXED = {
-        "縺・■縺・: 0.9,
-        "縺ｶ縺ｩ縺・: 0.87,
-        "繧ｷ繝｣繧､繝ｳ繝槭せ繧ｫ繝・ヨ": 0.87,
-        "蟾ｨ蟲ｰ": 0.87,
-        "繧ｯ繧､繝ｼ繝ｳ繝ｫ繝ｼ繧ｸ繝･": 0.87,
-        "繧ｯ繧､繝ｼ繝ｳ繝九・繝・: 0.87,
-        "繝翫ぎ繝弱ヱ繝ｼ繝励Ν": 0.87,
-        "繝悶Ν繝ｼ繝吶Μ繝ｼ": 0.98,
-        "繝悶Λ繝・け繝吶Μ繝ｼ": 0.9,
-        "繝√ぉ繝ｪ繝ｼ": 0.95,
-        "繧｢繝｡繝ｪ繧ｫ繝ｳ繝√ぉ繝ｪ繝ｼ": 0.95,
-        "繧ゅｂ": 0.93,
-        "譯・: 0.93,
-        "繝阪け繧ｿ繝ｪ繝ｳ": 0.95,
-        "繝｡繝ｭ繝ｳ": 0.6,
-        "繝ｬ繝｢繝ｳ": 0.45,
-        "譴ｨ": 0.9,
-        "繧ｫ繧ｷ繧ｹ": 0.98,
-        "繝槭せ繧ｫ繝ｫ繝昴・繝・: 1.0,
-        "繧ｯ繝ｪ繝ｼ繝繝√・繧ｺ": 1.0
+        "いちご": 0.9,
+        "ぶどう": 0.87,
+        "シャインマスカット": 0.87,
+        "巨峰": 0.87,
+        "クイーンルージュ": 0.87,
+        "クイーンニーナ": 0.87,
+        "ナガノパープル": 0.87,
+        "ブルーベリー": 0.98,
+        "ブラックベリー": 0.9,
+        "チェリー": 0.95,
+        "アメリカンチェリー": 0.95,
+        "もも": 0.93,
+        "桃": 0.93,
+        "ネクタリン": 0.95,
+        "メロン": 0.6,
+        "レモン": 0.45,
+        "梨": 0.9,
+        "カシス": 0.98,
+        "マスカルポーネ": 1.0,
+        "クリームチーズ": 1.0
       };
 
       const initialIngredients = [
-        { id: "granola", name: "繧ｰ繝ｩ繝弱・繝ｩ", category: "granola", pricePerKg: 1921 },
-        { id: "whip", name: "繝帙う繝・・", category: "cream", pricePerKg: 871 }
+        { id: "granola", name: "グラノーラ", category: "granola", pricePerKg: 1921 },
+        { id: "whip", name: "ホイップ", category: "cream", pricePerKg: 871 }
       ];
 
       const shippingPerKg = (f) =>
@@ -88,42 +88,42 @@
       const initialBases = [
         {
           id: uid(),
-          name: "繝輔Ο繝ｼ繧ｺ繝ｳ繝ｨ繝ｼ繧ｰ繝ｫ繝・,
+          name: "フローズンヨーグルト",
           finishedWeightG: 2872.088,
           lines: [
-            { id: uid(), name: "陷り惧", pricePerKg: 1375, qtyG: 42 },
-            { id: uid(), name: "邊我ｹｳ", pricePerKg: 1097, qtyG: 126, isYogurtComponent: true },
-            { id: uid(), name: "逕倥∩謌仙・", pricePerKg: 1079, qtyG: 730 },
-            { id: uid(), name: "迚帑ｹｳ", pricePerKg: 209, qtyG: 1974, isYogurtComponent: true },
-            { id: uid(), name: "荵ｳ驟ｸ闖・, pricePerKg: 252000, qtyG: 0.088, isYogurtComponent: true }
+            { id: uid(), name: "蜂蜜", pricePerKg: 1375, qtyG: 42 },
+            { id: uid(), name: "粉乳", pricePerKg: 1097, qtyG: 126, isYogurtComponent: true },
+            { id: uid(), name: "甘み成分", pricePerKg: 1079, qtyG: 730 },
+            { id: uid(), name: "牛乳", pricePerKg: 209, qtyG: 1974, isYogurtComponent: true },
+            { id: uid(), name: "乳酸菌", pricePerKg: 252000, qtyG: 0.088, isYogurtComponent: true }
           ]
         },
-        { id: uid(), name: "繝ｨ繝ｼ繧ｰ繝ｫ繝・, finishedWeightG: 2100.088, lines: [] },
-        { id: uid(), name: "繧ｮ繝ｪ繧ｷ繝｣繝ｨ繝ｼ繧ｰ繝ｫ繝・, finishedWeightG: 1000, lines: [] }
+        { id: uid(), name: "ヨーグルト", finishedWeightG: 2100.088, lines: [] },
+        { id: uid(), name: "ギリシャヨーグルト", finishedWeightG: 1000, lines: [] }
       ];
 
       const initialFruits = [
-        { id: uid(), supplier: "豐｢逕ｰ蝠・ｺ・, fruitName: "繝悶Λ繝・け繝吶Μ繝ｼ", contractPricePerKg: 1350, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["繝悶Λ繝・け繝吶Μ繝ｼ"] },
-        { id: uid(), supplier: "", fruitName: "蜈ｫ繝ｶ蟯ｳ繝悶Ν繝ｼ繝吶Μ繝ｼ", contractPricePerKg: 1500, shippingCostTotal: 1500, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["繝悶Ν繝ｼ繝吶Μ繝ｼ"] },
-        { id: uid(), supplier: "豐｢逕ｰ蝠・ｺ・, fruitName: "繧ｯ繝ｩ繝ｳ繝吶Μ繝ｼ", contractPricePerKg: 1340, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: 0.98 },
-        { id: uid(), supplier: "鬧偵Ω譬ｹ縺・■縺泌恍", fruitName: "縺・■縺・, variety: "邏・⊇縺｣縺ｺ", contractPricePerKg: 1200, shippingCostTotal: 1200, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["縺・■縺・] },
-        { id: uid(), supplier: "369FARM", fruitName: "縺輔・縺ｮ繝ｬ繝｢繝ｳ", contractPricePerKg: 1000, shippingCostTotal: 1431, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["繝ｬ繝｢繝ｳ"] },
-        { id: uid(), supplier: "蠑伜燕蛟牙ｺｫ", fruitName: "蠑伜燕繧ｫ繧ｷ繧ｹ", contractPricePerKg: 1458, shippingCostTotal: 1580, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["繧ｫ繧ｷ繧ｹ"] },
-        { id: uid(), supplier: "鬧偵Ω譬ｹ縺・■縺泌恍", fruitName: "逕溘＞縺｡縺・, variety: "邏・⊇縺｣縺ｺ", contractPricePerKg: 1600, shippingCostTotal: 1500, shipmentWeightKg: 4.8, edibleRatio: EDIBLE_FIXED["縺・■縺・] },
-        { id: uid(), supplier: "豐｢逕ｰ蝠・ｺ・, fruitName: "繧｢繝｡繝ｪ繧ｫ繝ｳ繝√ぉ繝ｪ繝ｼ", contractPricePerKg: 1750, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["繧｢繝｡繝ｪ繧ｫ繝ｳ繝√ぉ繝ｪ繝ｼ"] },
-        { id: uid(), supplier: "繧ｦ繧ｨ繝繝ｩ繝｡繝ｭ繝ｳ繝輔ぃ繝ｼ繝", fruitName: "繧ｿ繧ｫ繝溘Γ繝ｭ繝ｳ", contractPricePerKg: 500, shippingCostTotal: 1606, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["繝｡繝ｭ繝ｳ"] },
-        { id: uid(), supplier: "荳ｭ譚題ｾｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "蟾ｨ蟲ｰ", contractPricePerKg: 2125, shippingCostTotal: 2500, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["蟾ｨ蟲ｰ"] },
-        { id: uid(), supplier: "荳ｭ譚題ｾｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "繧ｯ繧､繝ｼ繝ｳ繝ｫ繝ｼ繧ｸ繝･", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["繧ｯ繧､繝ｼ繝ｳ繝ｫ繝ｼ繧ｸ繝･"] },
-        { id: uid(), supplier: "荳ｭ譚題ｾｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "繝翫ぎ繝弱ヱ繝ｼ繝励Ν", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["繝翫ぎ繝弱ヱ繝ｼ繝励Ν"] },
-        { id: uid(), supplier: "荳ｭ譚題ｾｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "繧ｯ繧､繝ｼ繝ｳ繝九・繝・, contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["繧ｯ繧､繝ｼ繝ｳ繝九・繝・] },
-        { id: uid(), supplier: "荳ｭ譚題ｾｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "繧ｷ繝｣繧､繝ｳ繝槭せ繧ｫ繝・ヨ", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["繧ｷ繝｣繧､繝ｳ繝槭せ繧ｫ繝・ヨ"] },
-        { id: uid(), supplier: "荳螳溷ｱ・, fruitName: "縺ｶ縺ｩ縺・, variety: "蟾ｨ蟲ｰ", contractPricePerKg: 1000, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["蟾ｨ蟲ｰ"] },
-        { id: uid(), supplier: "荳螳溷ｱ・, fruitName: "譯・, contractPricePerKg: 1142, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["譯・] },
-        { id: uid(), supplier: "繝輔Ν繝ｼ繝・ｷ･謌ｿ繧ｿ繝ｳ繧ｶ繝ｯ", fruitName: "繝阪け繧ｿ繝ｪ繝ｳ", contractPricePerKg: 1400, shippingCostTotal: 1000, shipmentWeightKg: 5, edibleRatio: EDIBLE_FIXED["繝阪け繧ｿ繝ｪ繝ｳ"] },
-        { id: uid(), supplier: "蟆城㍽霎ｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "BK繧ｷ繝ｼ繝峨Ξ繧ｹ", contractPricePerKg: 1400, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["縺ｶ縺ｩ縺・] },
-        { id: uid(), supplier: "蟆城㍽霎ｲ蝨・, fruitName: "縺ｶ縺ｩ縺・, variety: "蟾ｨ蟲ｰ", contractPricePerKg: 1000, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["蟾ｨ蟲ｰ"] },
-        { id: uid(), supplier: "荳ｭ豐｢荵ｳ讌ｭ", fruitName: "繝槭せ繧ｫ繝ｫ繝昴・繝・, contractPricePerKg: 2580, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["繝槭せ繧ｫ繝ｫ繝昴・繝・] },
-        { id: uid(), supplier: "繝輔ぅ繝ｩ繝・Ν繝輔ぅ繧｢", fruitName: "繧ｯ繝ｪ繝ｼ繝繝√・繧ｺ", contractPricePerKg: 1430, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["繧ｯ繝ｪ繝ｼ繝繝√・繧ｺ"] }
+        { id: uid(), supplier: "沢田商事", fruitName: "ブラックベリー", contractPricePerKg: 1350, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["ブラックベリー"] },
+        { id: uid(), supplier: "", fruitName: "八ヶ岳ブルーベリー", contractPricePerKg: 1500, shippingCostTotal: 1500, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["ブルーベリー"] },
+        { id: uid(), supplier: "沢田商事", fruitName: "クランベリー", contractPricePerKg: 1340, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: 0.98 },
+        { id: uid(), supplier: "駒ヶ根いちご園", fruitName: "いちご", variety: "紅ほっぺ", contractPricePerKg: 1200, shippingCostTotal: 1200, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["いちご"] },
+        { id: uid(), supplier: "369FARM", fruitName: "さぶのレモン", contractPricePerKg: 1000, shippingCostTotal: 1431, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["レモン"] },
+        { id: uid(), supplier: "弘前倉庫", fruitName: "弘前カシス", contractPricePerKg: 1458, shippingCostTotal: 1580, shipmentWeightKg: 16, edibleRatio: EDIBLE_FIXED["カシス"] },
+        { id: uid(), supplier: "駒ヶ根いちご園", fruitName: "生いちご", variety: "紅ほっぺ", contractPricePerKg: 1600, shippingCostTotal: 1500, shipmentWeightKg: 4.8, edibleRatio: EDIBLE_FIXED["いちご"] },
+        { id: uid(), supplier: "沢田商事", fruitName: "アメリカンチェリー", contractPricePerKg: 1750, shippingCostTotal: 2180, shipmentWeightKg: 15, edibleRatio: EDIBLE_FIXED["アメリカンチェリー"] },
+        { id: uid(), supplier: "ウエムラメロンファーム", fruitName: "タカミメロン", contractPricePerKg: 500, shippingCostTotal: 1606, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["メロン"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 2125, shippingCostTotal: 2500, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "クイーンルージュ", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["クイーンルージュ"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "ナガノパープル", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["ナガノパープル"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "クイーンニーナ", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["クイーンニーナ"] },
+        { id: uid(), supplier: "中村農園", fruitName: "ぶどう", variety: "シャインマスカット", contractPricePerKg: 2500, shippingCostTotal: 2000, shipmentWeightKg: 8, edibleRatio: EDIBLE_FIXED["シャインマスカット"] },
+        { id: uid(), supplier: "一実屋", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 1000, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "一実屋", fruitName: "桃", contractPricePerKg: 1142, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["桃"] },
+        { id: uid(), supplier: "フルーツ工房タンザワ", fruitName: "ネクタリン", contractPricePerKg: 1400, shippingCostTotal: 1000, shipmentWeightKg: 5, edibleRatio: EDIBLE_FIXED["ネクタリン"] },
+        { id: uid(), supplier: "小野農園", fruitName: "ぶどう", variety: "BKシードレス", contractPricePerKg: 1400, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["ぶどう"] },
+        { id: uid(), supplier: "小野農園", fruitName: "ぶどう", variety: "巨峰", contractPricePerKg: 1000, shippingCostTotal: 1800, shipmentWeightKg: 10, edibleRatio: EDIBLE_FIXED["巨峰"] },
+        { id: uid(), supplier: "中沢乳業", fruitName: "マスカルポーネ", contractPricePerKg: 2580, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["マスカルポーネ"] },
+        { id: uid(), supplier: "フィラデルフィア", fruitName: "クリームチーズ", contractPricePerKg: 1430, shippingCostTotal: 0, edibleRatio: EDIBLE_FIXED["クリームチーズ"] }
       ];
 
       function Card({ title, value, subtitle }) {
@@ -143,29 +143,31 @@
         const [form, setForm] = useState({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" });
         const list = fruits.filter((f) => `${f.supplier} ${f.fruitName} ${f.variety ?? ""}`.includes(q));
         const toNum = (s) => { const v = Number(s); return isFinite(v) ? v : undefined; };
-        // 譌｢螳壹ヶ繝ｬ繝ｳ繝蛾㍼・・繧ｵ繧､繧ｺ譎ゅ・譫懃黄g・・        const blendDefault = (f) => {
+        // 既定ブレンド量（Sサイズ時の果物g）
+        const blendDefault = (f) => {
           const name = f?.fruitName || "";
           const variety = f?.variety || "";
-          if (name.includes("蜈ｫ繝ｶ蟯ｳ繝悶Ν繝ｼ繝吶Μ繝ｼ")) return 33;
-          if (name.includes("繧ｯ繝ｩ繝ｳ繝吶Μ繝ｼ")) return 20;
-          if (name.includes("繧｢繝｡繝ｪ繧ｫ繝ｳ繝√ぉ繝ｪ繝ｼ")) return 40;
-          if (name.includes("繧ｿ繧ｫ繝溘Γ繝ｭ繝ｳ")) return 37;
-          if (name.includes("繝阪け繧ｿ繝ｪ繝ｳ")) return 37;
-          if (name.includes("繝ｬ繝｢繝ｳ")) return 15;
-          if (name.includes("蠑伜燕繧ｫ繧ｷ繧ｹ") || name.includes("繧ｫ繧ｷ繧ｹ")) return 15;
-          if (name.includes("繝槭せ繧ｫ繝ｫ繝・)) return 20;
-          if (name.includes("繧ｯ繝ｪ繝ｼ繝繝・)) return 17;
-          if (name.includes("繧ゅｂ") || name.includes("譯・)) return 40;
+          if (name.includes("八ヶ岳ブルーベリー")) return 33;
+          if (name.includes("クランベリー")) return 20;
+          if (name.includes("アメリカンチェリー")) return 40;
+          if (name.includes("タカミメロン")) return 37;
+          if (name.includes("ネクタリン")) return 37;
+          if (name.includes("レモン")) return 15;
+          if (name.includes("弘前カシス") || name.includes("カシス")) return 15;
+          if (name.includes("マスカルポ")) return 20;
+          if (name.includes("クリームチ")) return 17;
+          if (name.includes("もも") || name.includes("桃")) return 40;
           if (
-            name.includes("縺ｶ縺ｩ") ||
-            variety.includes("蟾ｨ蟲ｰ") || name.includes("蟾ｨ蟲ｰ") ||
-            variety.includes("繧ｷ繝｣繧､繝ｳ") || name.includes("繧ｷ繝｣繧､繝ｳ") ||
-            variety.includes("繝翫ぎ繝・) || name.includes("繝翫ぎ繝・) ||
-            variety.includes("繧ｯ繧､繝ｼ繝ｳ") || name.includes("繧ｯ繧､繝ｼ繝ｳ")
+            name.includes("ぶど") ||
+            variety.includes("巨峰") || name.includes("巨峰") ||
+            variety.includes("シャイン") || name.includes("シャイン") ||
+            variety.includes("ナガノ") || name.includes("ナガノ") ||
+            variety.includes("クイーン") || name.includes("クイーン")
           ) return 40;
-          // 繝悶Λ繝・け繝吶Μ繝ｼ邉ｻ・医ヶ繝ｫ繝ｼ/繧ｯ繝ｩ繝ｳ/繧ｫ繧ｷ繧ｹ髯､螟厄ｼ・          if (name.includes("繝吶Μ繝ｼ") && !name.includes("繝悶Ν繝ｼ") && !name.includes("繧ｯ繝ｩ繝ｳ") && !name.includes("繧ｫ繧ｷ繧ｹ")) return 30;
-          // 縺・■縺皮ｳｻ
-          if (name.includes("縺・■") || name.includes("闍ｺ")) return 35;
+          // ブラックベリー系（ブルー/クラン/カシス除外）
+          if (name.includes("ベリー") && !name.includes("ブルー") && !name.includes("クラン") && !name.includes("カシス")) return 30;
+          // いちご系
+          if (name.includes("いち") || name.includes("苺")) return 35;
           return undefined;
         };
         const openNew = () => { setEditing(null); setForm({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" }); setOpen(true); };
@@ -193,8 +195,8 @@
         return (
           <div className="px-4 pb-10">
             <div className="mb-2 flex items-center gap-2">
-              <input className="border rounded-xl p-2 w-full" placeholder="霎ｲ螳ｶ/譫懃黄/蜩∫ｨｮ縺ｧ讀懃ｴ｢" value={q} onChange={(e) => setQ(e.target.value)} />
-              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">譁ｰ隕剰ｿｽ蜉</button>
+              <input className="border rounded-xl p-2 w-full" placeholder="農家/果物/品種で検索" value={q} onChange={(e) => setQ(e.target.value)} />
+              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">新規追加</button>
             </div>
             <div className="space-y-2">
               {list.map((f) => {
@@ -208,38 +210,38 @@
                     <div key={f.id} className="bg-white rounded-2xl p-3 shadow-sm fruit-card">
                     <div className="flex items-start justify-between">
                       <div>
-                        <div className="font-semibold">{f.supplier ? `${f.supplier}・彖 : ""}{f.fruitName}{f.variety ? `・・{f.variety}・荏 : ""}</div>
+                        <div className="font-semibold">{f.supplier ? `${f.supplier}｜` : ""}{f.fruitName}{f.variety ? `（${f.variety}）` : ""}</div>
                         <div className="text-sm mt-1">
-                          <span className="font-medium">螳溯ｳｪ ﾂ･/kg・亥庄鬟滄←逕ｨ・会ｼ・/span>
-                          <span className="font-extrabold">・･{edibleKg.toLocaleString()}</span>
-                          <span className="ml-3 text-xs opacity-70">FY繝輔Ξ繝ｼ繝舌・ S:・･{sCost.toLocaleString()} / M:・･{mCost.toLocaleString()}</span>
+                          <span className="font-medium">実質 ¥/kg（可食適用）：</span>
+                          <span className="font-extrabold">￥{edibleKg.toLocaleString()}</span>
+                          <span className="ml-3 text-xs opacity-70">FYフレーバー S:￥{sCost.toLocaleString()} / M:￥{mCost.toLocaleString()}</span>
                         </div>
-                        <div className="text-xs opacity-70 mt-1">螂醍ｴ・ｿ･{(f.contractPricePerKg || 0).toLocaleString()} /kg・憺∵侭・･{includeShipping ? shippingPerKg(f) : 0} /kg・懷庄鬟・{f.edibleRatio ?? 1}</div>
-                        {/* 1g・亥庄鬟滄←逕ｨ・芽｡ｨ遉ｺ縺ｯ髱櫁｡ｨ遉ｺ縺ｫ縺励∪縺励◆ */}
+                        <div className="text-xs opacity-70 mt-1">契約￥{(f.contractPricePerKg || 0).toLocaleString()} /kg｜送料￥{includeShipping ? shippingPerKg(f) : 0} /kg｜可食 {f.edibleRatio ?? 1}</div>
+                        {/* 1g（可食適用）表示は非表示にしました */}
                       </div>
-                      <button onClick={() => openEdit(f)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">邱ｨ髮・/button>
+                      <button onClick={() => openEdit(f)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "譫懃黄繧堤ｷｨ髮・ : "譫懃黄繧定ｿｽ蜉"}>
+            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "果物を編集" : "果物を追加"}>
               <div className="grid gap-2 text-sm">
-                <label>莉募・蜈・input className="border rounded-xl p-2 w-full" value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} /></label>
-                <label>譫懃黄蜷・input className="border rounded-xl p-2 w-full" value={form.fruitName} onChange={(e) => setForm({ ...form, fruitName: e.target.value })} /></label>
-                <label>蜩∫ｨｮ・井ｻｻ諢擾ｼ・input className="border rounded-xl p-2 w-full" value={form.variety} onChange={(e) => setForm({ ...form, variety: e.target.value })} /></label>
-                <label>螂醍ｴ・ｾ｡譬ｼ(蜀・kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.contract} onChange={(e) => setForm({ ...form, contract: e.target.value })} /></label>
+                <label>仕入先<input className="border rounded-xl p-2 w-full" value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} /></label>
+                <label>果物名<input className="border rounded-xl p-2 w-full" value={form.fruitName} onChange={(e) => setForm({ ...form, fruitName: e.target.value })} /></label>
+                <label>品種（任意）<input className="border rounded-xl p-2 w-full" value={form.variety} onChange={(e) => setForm({ ...form, variety: e.target.value })} /></label>
+                <label>契約価格(円/kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.contract} onChange={(e) => setForm({ ...form, contract: e.target.value })} /></label>
                 <div className="grid grid-cols-2 gap-2">
-                  <label>騾∵侭邱城｡・蜀・<input type="number" className="border rounded-xl p-2 w-full" value={form.shipTotal} onChange={(e) => setForm({ ...form, shipTotal: e.target.value })} /></label>
-                  <label>驟埼・㍾驥・kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipKg} onChange={(e) => setForm({ ...form, shipKg: e.target.value })} /></label>
+                  <label>送料総額(円)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipTotal} onChange={(e) => setForm({ ...form, shipTotal: e.target.value })} /></label>
+                  <label>配送重量(kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipKg} onChange={(e) => setForm({ ...form, shipKg: e.target.value })} /></label>
                 </div>
-                <label>蜿ｯ鬟滄Κ邇・0縲・)<input type="number" step="0.01" className="border rounded-xl p-2 w-full" value={form.edible} onChange={(e) => setForm({ ...form, edible: e.target.value })} /></label>
+                <label>可食部率(0〜1)<input type="number" step="0.01" className="border rounded-xl p-2 w-full" value={form.edible} onChange={(e) => setForm({ ...form, edible: e.target.value })} /></label>
                 <div className="flex justify-between items-center gap-2 mt-2">
-                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">蜑企勁</button>}
+                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">削除</button>}
                   <div className="ml-auto flex gap-2">
-                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
-                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">菫晏ｭ・/button>
+                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
                   </div>
                 </div>
               </div>
@@ -249,17 +251,17 @@
       }
 
       function BaseEditor({ bases, setBases, fyKg }) {
-        const fy = bases.find((b) => b.name === "繝輔Ο繝ｼ繧ｺ繝ｳ繝ｨ繝ｼ繧ｰ繝ｫ繝・);
+        const fy = bases.find((b) => b.name === "フローズンヨーグルト");
         const updateLine = (id, patch) => {
           const next = { ...fy, lines: fy.lines.map((l) => (l.id === id ? { ...l, ...patch } : l)) };
           setBases(bases.map((b) => (b.id === fy.id ? next : b)));
         };
         const add = () => {
-          const name = prompt("譚先侭蜷・);
+          const name = prompt("材料名");
           if (!name) return;
-          const price = Number(prompt("蜊倅ｾ｡(蜀・kg)", "0") || 0);
-          const qty = Number(prompt("謨ｰ驥・g)", "0") || 0);
-          const yo = confirm("繝ｨ繝ｼ繧ｰ繝ｫ繝域・蛻・↓蜷ｫ繧√ｋ・・);
+          const price = Number(prompt("単価(円/kg)", "0") || 0);
+          const qty = Number(prompt("数量(g)", "0") || 0);
+          const yo = confirm("ヨーグルト成分に含める？");
           const next = { ...fy, lines: [...fy.lines, { id: uid(), name, pricePerKg: price, qtyG: qty, isYogurtComponent: yo }] };
           setBases(bases.map((b) => (b.id === fy.id ? next : b)));
         };
@@ -268,7 +270,8 @@
           setBases(bases.map((b) => (b.id === fy.id ? next : b)));
         };
 
-        // 繝ｨ繝ｼ繧ｰ繝ｫ繝域・蛻・・縺ｿ縺ｮ蜴滉ｾ｡・・g縺ゅ◆繧奇ｼ・        const yogurtCostTotal = (fy?.lines || []).reduce(
+        // ヨーグルト成分のみの原価（kgあたり）
+        const yogurtCostTotal = (fy?.lines || []).reduce(
           (sum, l) => sum + (l.isYogurtComponent ? (l.pricePerKg / 1000) * (l.qtyG || 0) : 0),
           0
         );
@@ -283,10 +286,10 @@
           <div className="px-4 pb-10">
             <div className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <div className="font-semibold">FY驟榊粋・按･/kg・夲ｿ･{fyKg.toLocaleString()}・・/div>
-                <button onClick={add} className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-sm">陦瑚ｿｽ蜉</button>
+                <div className="font-semibold">FY配合（¥/kg：￥{fyKg.toLocaleString()}）</div>
+                <button onClick={add} className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-sm">行追加</button>
               </div>
-              <div className="text-sm text-neutral-600 mb-2">繝ｨ繝ｼ繧ｰ繝ｫ繝域・蛻・ﾂ･/kg ・･{yogurtKg.toLocaleString()}</div>
+              <div className="text-sm text-neutral-600 mb-2">ヨーグルト成分 ¥/kg ￥{yogurtKg.toLocaleString()}</div>
               <div className="space-y-2">
                 {fy.lines.map((l) => (
                   <div key={l.id} className="grid grid-cols-10 gap-2 items-center">
@@ -295,8 +298,9 @@
                     <input type="number" className="col-span-2 border rounded-xl p-2" value={l.qtyG} onChange={(e) => updateLine(l.id, { qtyG: Number(e.target.value) })} />
                     <label className="col-span-2 text-sm flex items-center gap-2">
                       <input type="checkbox" checked={!!l.isYogurtComponent} onChange={(e) => updateLine(l.id, { isYogurtComponent: e.target.checked })} />
-                      繝ｨ繝ｼ繧ｰ繝ｫ繝域・蛻・                    </label>
-                    <button className="col-span-1 text-sm text-red-600" onClick={() => del(l.id)}>蜑企勁</button>
+                      ヨーグルト成分
+                    </label>
+                    <button className="col-span-1 text-sm text-red-600" onClick={() => del(l.id)}>削除</button>
                   </div>
                 ))}
               </div>
@@ -315,7 +319,7 @@
         const create = () => {
           if (!name) return;
           const id = uid();
-          const lines = cat === "逕溘・縺帙す繝ｪ繝ｼ繧ｺ"
+          const lines = cat === "生のせシリーズ"
             ? [{ id: uid(), type: "fruit", qtyG: 60 }, { id: uid(), type: "base", qtyG: 100 }]
             : [];
           setItems([...items, { id, name, category: cat, lines }]);
@@ -327,18 +331,18 @@
           const selected = value || "";
           return (
             <select className="border rounded-xl p-2 w-full" value={selected} onChange={(e) => onChange(e.target.value)}>
-              <option value="">譚先侭繧帝∈謚・/option>
-              <optgroup label="譫懃黄">
+              <option value="">材料を選択</option>
+              <optgroup label="果物">
                 {fruits.map((f) => (
                   <option key={"f:" + f.id} value={"f:" + f.id}>
-                    {`${f.supplier ? f.supplier + "・・ : ""}${f.fruitName}${f.variety ? `・・{f.variety}・荏 : ""}`}
+                    {`${f.supplier ? f.supplier + "｜" : ""}${f.fruitName}${f.variety ? `（${f.variety}）` : ""}`}
                   </option>
                 ))}
               </optgroup>
-              <optgroup label="縺昴・莉・>
+              <optgroup label="その他">
                 {ingredients.map((i) => (
                   <option key={"i:" + i.id} value={"i:" + i.id}>
-                    {`${i.name}・茨ｿ･${i.pricePerKg}/kg・荏}
+                    {`${i.name}（￥${i.pricePerKg}/kg）`}
                   </option>
                 ))}
               </optgroup>
@@ -363,8 +367,8 @@
         const menuCost = (m) => rY(m.lines.reduce((s, l) => s + lineCost(l), 0));
 
         const addTypedLine = (m) => {
-          const type = (prompt("陦後ち繧､繝暦ｼ・ruit / base / ingredient / sauce / cream / granola / topping / container・・, "fruit") || "fruit");
-          const qty = Number(prompt("謨ｰ驥充g]", "0") || 0);
+          const type = (prompt("行タイプ（fruit / base / ingredient / sauce / cream / granola / topping / container）", "fruit") || "fruit");
+          const qty = Number(prompt("数量[g]", "0") || 0);
           const newLine = { id: uid(), type, qtyG: qty };
           setItems(items.map((x) => (x.id === m.id ? { ...x, lines: [...x.lines, newLine] } : x)));
         };
@@ -402,10 +406,10 @@
         return (
           <div className="px-4 pb-16">
             <div className="flex gap-2 mb-3">
-              {["繝代ヵ繧ｧ", "逕溘・縺帙す繝ｪ繝ｼ繧ｺ", "繝輔Ν繝ｼ繝・し繝ｳ繝・].map((t) => (
+              {["パフェ", "生のせシリーズ", "フルーツサンド"].map((t) => (
                 <button key={t} onClick={() => setCat(t)} className={`px-3 py-2 rounded-xl text-sm shadow-sm ${cat === t ? "bg-emerald-600 text-white" : "bg-white"}`}>{t}</button>
               ))}
-              <button onClick={() => setOpen(true)} className="ml-auto px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">{cat}繧定ｿｽ蜉</button>
+              <button onClick={() => setOpen(true)} className="ml-auto px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">{cat}を追加</button>
             </div>
 
             {items.filter((x) => x.category === cat).map((m) => (
@@ -413,11 +417,11 @@
                 <div className="flex items-center justify-between">
                   <div className="font-semibold">{m.name}</div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => openEditMenu(m)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">邱ｨ髮・/button>
-                    <button onClick={() => removeMenu(m)} className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm">蜑企勁</button>
+                    <button onClick={() => openEditMenu(m)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
+                    <button onClick={() => removeMenu(m)} className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm">削除</button>
                   </div>
                 </div>
-                <div className="mt-2 text-sm">1蛟句次萓｡・・b>・･{menuCost(m).toLocaleString()}</b></div>
+                <div className="mt-2 text-sm">1個原価：<b>￥{menuCost(m).toLocaleString()}</b></div>
 
                 <div className="mt-3 space-y-2">
                   {m.lines.map((l) => (
@@ -441,7 +445,7 @@
                           }
                         />
                       </div>
-                      <div className="col-span-3 text-right text-sm">・･{rY(lineCost(l)).toLocaleString()}</div>
+                      <div className="col-span-3 text-right text-sm">￥{rY(lineCost(l)).toLocaleString()}</div>
                       <div className="col-span-2 text-sm opacity-70">{l.type}</div>
                       <div className="col-span-1 text-right">
                         <button
@@ -454,7 +458,7 @@
                             ))
                           }
                         >
-                          蜑企勁
+                          削除
                         </button>
                       </div>
                     </div>
@@ -462,28 +466,29 @@
                 </div>
 
                 <div className="mt-3">
-                  <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">陦瑚ｿｽ蜉</button>
+                  <button onClick={() => addTypedLine(m)} className="px-3 py-1 bg-neutral-100 rounded-xl text-sm">行追加</button>
                 </div>
               </div>
             ))}
 
-            <Modal open={open} onClose={() => setOpen(false)} title={`${cat}繧定ｿｽ蜉`}>
+            <Modal open={open} onClose={() => setOpen(false)} title={`${cat}を追加`}>
               <div className="grid gap-2">
-                <label className="text-sm">繝｡繝九Η繝ｼ蜷・                  <input className="border rounded-xl p-2 w-full" value={name} onChange={(e) => setName(e.target.value)} />
+                <label className="text-sm">メニュー名
+                  <input className="border rounded-xl p-2 w-full" value={name} onChange={(e) => setName(e.target.value)} />
                 </label>
                 <div className="flex justify-end gap-2 mt-3">
-                  <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
-                  <button onClick={create} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">菴懈・</button>
+                  <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                  <button onClick={create} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">作成</button>
                 </div>
               </div>
             </Modal>
 
-            <Modal open={menuEditOpen} onClose={() => setMenuEditOpen(false)} title="繝｡繝九Η繝ｼ蜷阪ｒ邱ｨ髮・>
+            <Modal open={menuEditOpen} onClose={() => setMenuEditOpen(false)} title="メニュー名を編集">
               <div className="grid gap-2">
                 <input className="border rounded-xl p-2 w-full" value={menuEditName} onChange={(e) => setMenuEditName(e.target.value)} />
                 <div className="flex justify-end gap-2 mt-3">
-                  <button onClick={() => setMenuEditOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
-                  <button onClick={saveEditMenu} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">菫晏ｭ・/button>
+                  <button onClick={() => setMenuEditOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                  <button onClick={saveEditMenu} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
                 </div>
               </div>
             </Modal>
@@ -513,8 +518,8 @@
         return (
           <div className="px-4 pb-16">
             <div className="mb-2 flex items-center gap-2">
-              <input className="border rounded-xl p-2 w-full" placeholder="譚先侭蜷・繧ｫ繝・ざ繝ｪ縺ｧ讀懃ｴ｢" value={q} onChange={(e) => setQ(e.target.value)} />
-              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">譁ｰ隕剰ｿｽ蜉</button>
+              <input className="border rounded-xl p-2 w-full" placeholder="材料名/カテゴリで検索" value={q} onChange={(e) => setQ(e.target.value)} />
+              <button onClick={openNew} className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-sm">新規追加</button>
             </div>
             <div className="space-y-2">
               {list.map((i) => (
@@ -522,18 +527,18 @@
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-semibold">{i.name}</div>
-                      <div className="text-xs opacity-70 mt-1">繧ｫ繝・ざ繝ｪ: {i.category}・慊･/kg: ・･{i.pricePerKg}</div>
+                      <div className="text-xs opacity-70 mt-1">カテゴリ: {i.category}｜¥/kg: ￥{i.pricePerKg}</div>
                     </div>
-                    <button onClick={() => openEdit(i)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">邱ｨ髮・/button>
+                    <button onClick={() => openEdit(i)} className="px-3 py-1 bg-neutral-100 rounded-lg text-sm">編集</button>
                   </div>
                 </div>
               ))}
             </div>
 
-            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "譚先侭繧堤ｷｨ髮・ : "譚先侭繧定ｿｽ蜉"}>
+            <Modal open={open} onClose={() => setOpen(false)} title={editing ? "材料を編集" : "材料を追加"}>
               <div className="grid gap-2 text-sm">
-                <label>譚先侭蜷・input className="border rounded-xl p-2 w-full" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-                <label>繧ｫ繝・ざ繝ｪ
+                <label>材料名<input className="border rounded-xl p-2 w-full" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
+                <label>カテゴリ
                   <select className="border rounded-xl p-2 w-full" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
                     <option value="ingredient">ingredient</option>
                     <option value="sauce">sauce</option>
@@ -543,12 +548,12 @@
                     <option value="container">container</option>
                   </select>
                 </label>
-                <label>萓｡譬ｼ(蜀・kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
+                <label>価格(円/kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
                 <div className="flex justify-between items-center gap-2 mt-2">
-                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">蜑企勁</button>}
+                  {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">削除</button>}
                   <div className="ml-auto flex gap-2">
-                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
-                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">菫晏ｭ・/button>
+                    <button onClick={() => setOpen(false)} className="px-3 py-2 rounded-xl bg-neutral-100">キャンセル</button>
+                    <button onClick={save} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">保存</button>
                   </div>
                 </div>
               </div>
@@ -561,11 +566,12 @@
         return (
           <div className="px-4 pb-16">
             <div className="bg-white rounded-2xl p-4 shadow-sm">
-              <div className="font-semibold mb-2">陦ｨ遉ｺ縺ｨ險育ｮ・/div>
+              <div className="font-semibold mb-2">表示と計算</div>
               <div className="flex items-center gap-4 text-sm">
                 <label className="inline-flex items-center gap-2">
                   <input type="checkbox" checked={includeShipping} onChange={(e) => setIncludeShipping(e.target.checked)} />
-                  騾∵侭霎ｼ縺ｿ・井ｸ隕ｧ繝ｻ險育ｮ暦ｼ・                </label>
+                  送料込み（一覧・計算）
+                </label>
               </div>
             </div>
           </div>
@@ -580,7 +586,7 @@
             <div className="relative bg-white rounded-2xl shadow-lg w-[92%] max-w-md p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="font-semibold">{title}</div>
-                <button onClick={onClose} className="text-sm opacity-70">髢峨§繧・/button>
+                <button onClick={onClose} className="text-sm opacity-70">閉じる</button>
               </div>
               {children}
             </div>
@@ -589,15 +595,15 @@
       }
 
       function App() {
-        const [tab, setTab] = usePersistentState("tab", "譫懃黄");
+        const [tab, setTab] = usePersistentState("tab", "果物");
         const [fruits, setFruits] = usePersistentState("fruits", initialFruits);
         const [bases, setBases] = usePersistentState("bases", initialBases);
         const [includeShipping, setIncludeShipping] = usePersistentState("includeShipping", true);
         const [ingredients, setIngredients] = usePersistentState("ingredients", initialIngredients);
         const [items, setItems] = usePersistentState("menus", []);
-        const [cat, setCat] = usePersistentState("menuCat", "逕溘・縺帙す繝ｪ繝ｼ繧ｺ");
+        const [cat, setCat] = usePersistentState("menuCat", "生のせシリーズ");
 
-        const fy = bases.find((b) => b.name === "繝輔Ο繝ｼ繧ｺ繝ｳ繝ｨ繝ｼ繧ｰ繝ｫ繝・);
+        const fy = bases.find((b) => b.name === "フローズンヨーグルト");
         const fyG = useMemo(() => basePerG(fy), [fy]);
         const fyKg = rY(fyG * 1000);
 
@@ -605,29 +611,30 @@
           <div className="min-h-screen bg-neutral-50 text-neutral-900">
             <div className="p-4 pb-2">
               <div className="flex items-center justify-between">
-                <div className="text-xl font-semibold">蜴滉ｾ｡繧｢繝励Μ・・VP・・/div>
-                <div className="text-sm opacity-70">遞取栢繝ｻ蝗帶昏莠泌・ / 蜿ｯ鬟・蝗ｺ螳夐←逕ｨ</div>
+                <div className="text-xl font-semibold">原価アプリ（MVP）</div>
+                <div className="text-sm opacity-70">税抜・四捨五入 / 可食=固定適用</div>
               </div>
             </div>
 
             <div className="px-4 mb-3 flex gap-2 flex-wrap">
-              {["譫懃黄", "繝吶・繧ｹ", "繝｡繝九Η繝ｼ", "縺昴・莉・, "險ｭ螳・].map((t) => (
+              {["果物", "ベース", "メニュー", "その他", "設定"].map((t) => (
                 <button key={t} onClick={() => setTab(t)} className={`px-3 py-2 rounded-xl text-sm shadow-sm ${tab === t ? "bg-emerald-600 text-white" : "bg-white"}`}>{t}</button>
               ))}
             </div>
 
-            {tab === "譫懃黄" && <FruitList fruits={fruits} setFruits={setFruits} includeShipping={includeShipping} fyPerG={fyG} />}
-            {tab === "繝吶・繧ｹ" && <BaseEditor bases={bases} setBases={setBases} fyKg={fyKg} />}
-            {tab === "繝｡繝九Η繝ｼ" && <MenuEditor fruits={fruits} fyPerG={fyG} ingredients={ingredients} items={items} setItems={setItems} cat={cat} setCat={setCat} />}
-            {tab === "縺昴・莉・ && <IngredientManager ingredients={ingredients} setIngredients={setIngredients} />}
-            {tab === "險ｭ螳・ && <Settings includeShipping={includeShipping} setIncludeShipping={setIncludeShipping} />}
+            {tab === "果物" && <FruitList fruits={fruits} setFruits={setFruits} includeShipping={includeShipping} fyPerG={fyG} />}
+            {tab === "ベース" && <BaseEditor bases={bases} setBases={setBases} fyKg={fyKg} />}
+            {tab === "メニュー" && <MenuEditor fruits={fruits} fyPerG={fyG} ingredients={ingredients} items={items} setItems={setItems} cat={cat} setCat={setCat} />}
+            {tab === "その他" && <IngredientManager ingredients={ingredients} setIngredients={setIngredients} />}
+            {tab === "設定" && <Settings includeShipping={includeShipping} setIncludeShipping={setIncludeShipping} />}
           </div>
         );
       }
 
-      // React 18 縺ｮ createRoot 縺ｧ繝槭え繝ｳ繝・      const root = ReactDOM.createRoot(document.getElementById("root"));
+      // React 18 の createRoot でマウント
+      const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
-      // ===== 縺薙％縺ｾ縺ｧ =====
+      // ===== ここまで =====
     </script>
   </body>
 </html>
