@@ -408,9 +408,9 @@
 
         const markSaved = (m) => {
           const snapshot = menuCost(m);
-          const cleared = m.lines.map((l) => ({ ...l, qtyG: "" }));
+          // Do not mutate lines when saving; preserve original data
           setItems(items.map((x) => (
-            x.id === m.id ? { ...x, saved: true, savedAt: Date.now(), savedCost: snapshot, lines: cleared } : x
+            x.id === m.id ? { ...x, saved: true, savedAt: Date.now(), savedCost: snapshot } : x
           )));
           // Open new menu dialog so user continues with a fresh item
           setOpen(true);
