@@ -25,17 +25,91 @@
       const uid = () => Math.random().toString(36).slice(2);
       const rY = (v) => Math.round(v);
 
-      function usePersistentState(key, initial) {
-        const [state, setState] = useState(() => {
+      // より確実な保存: IndexedDB を優先し、不可なら localStorage にフォールバック
+      // iOS Safari/ホーム画面アプリで localStorage が消える問題への対策
+      const storage = (() => {
+        let dbPromise = null;
+        const openDB = () => {
+          if (dbPromise) return dbPromise;
+          dbPromise = new Promise((resolve, reject) => {
+            try {
+              if (!('indexedDB' in window)) return reject(new Error('no indexedDB'));
+              const req = indexedDB.open('cost-wood-db', 1);
+              req.onupgradeneeded = () => {
+                const db = req.result;
+                if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+              };
+              req.onsuccess = () => resolve(req.result);
+              req.onerror = () => reject(req.error || new Error('idb open error'));
+            } catch (e) {
+              reject(e);
+            }
+          });
+          return dbPromise;
+        };
+        const get = async (key) => {
           try {
-            const raw = localStorage.getItem(key);
-            if (raw) return JSON.parse(raw);
-          } catch {}
-          return initial;
-        });
+            const db = await openDB();
+            return await new Promise((resolve, reject) => {
+              const tx = db.transaction('kv', 'readonly');
+              const store = tx.objectStore('kv');
+              const req = store.get(key);
+              req.onsuccess = () => resolve(req.result ?? null);
+              req.onerror = () => reject(req.error || new Error('idb get error'));
+            });
+          } catch {
+            try {
+              const raw = localStorage.getItem(key);
+              return raw ? JSON.parse(raw) : null;
+            } catch {
+              return null;
+            }
+          }
+        };
+        const set = async (key, val) => {
+          try {
+            const db = await openDB();
+            await new Promise((resolve, reject) => {
+              const tx = db.transaction('kv', 'readwrite');
+              const store = tx.objectStore('kv');
+              const req = store.put(val, key);
+              req.onsuccess = () => resolve();
+              req.onerror = () => reject(req.error || new Error('idb set error'));
+            });
+          } catch {
+            try {
+              localStorage.setItem(key, JSON.stringify(val));
+            } catch {
+              // どちらも失敗した場合は諦める（プライベートブラウズ等）
+            }
+          }
+        };
+        return { get, set };
+      })();
+
+      function usePersistentState(key, initial) {
+        const [state, setState] = useState(initial);
+        const [loaded, setLoaded] = useState(false);
+
+        // 初回ロードで保存済みデータを取得（IndexedDB -> localStorage）
         useEffect(() => {
-          localStorage.setItem(key, JSON.stringify(state));
-        }, [key, state]);
+          let cancelled = false;
+          (async () => {
+            const saved = await storage.get(key);
+            if (!cancelled && saved !== null && saved !== undefined) {
+              setState(saved);
+            }
+            if (!cancelled) setLoaded(true);
+          })();
+          return () => { cancelled = true; };
+        }, [key]);
+
+        // 状態が変わったら非同期で保存
+        useEffect(() => {
+          if (!loaded) return;
+          storage.set(key, state);
+        }, [key, state, loaded]);
+
         return [state, setState];
       }
 
@@ -626,7 +700,53 @@
         );
       }
 
-      function Settings({ includeShipping, setIncludeShipping }) {
+      function Settings({ includeShipping, setIncludeShipping, fruits, setFruits, bases, setBases, ingredients, setIngredients, items, setItems, cat, setCat }) {
+        const doExport = () => {
+          const data = {
+            fruits,
+            bases,
+            ingredients,
+            menus: items,
+            menuCat: cat,
+            includeShipping,
+            _meta: { exportedAt: new Date().toISOString(), app: 'cost-wood-1' }
+          };
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+          a.href = URL.createObjectURL(blob);
+          a.download = `cost-wood-backup-${ts}.json`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+        };
+        const doImport = () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'application/json';
+          input.onchange = async () => {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            try {
+              const text = await file.text();
+              const obj = JSON.parse(text);
+              if (!confirm('バックアップを読み込み、現在のデータを置き換えます。続行しますか？')) return;
+              if (Array.isArray(obj.fruits)) setFruits(obj.fruits);
+              if (Array.isArray(obj.bases)) setBases(obj.bases);
+              if (Array.isArray(obj.ingredients)) setIngredients(obj.ingredients);
+              if (Array.isArray(obj.menus)) setItems(obj.menus);
+              if (typeof obj.menuCat === 'string') setCat(obj.menuCat);
+              if (typeof obj.includeShipping === 'boolean') setIncludeShipping(obj.includeShipping);
+              alert('インポートが完了しました');
+            } catch (e) {
+              alert('JSONの読み取りに失敗しました');
+            } finally {
+              input.remove();
+            }
+          };
+          input.click();
+        };
+
         return (
           <div className="px-4 pb-16">
             <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -636,6 +756,15 @@
                   <input type="checkbox" checked={includeShipping} onChange={(e) => setIncludeShipping(e.target.checked)} />
                   送料込み（一覧・計算）
                 </label>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-4 shadow-sm mt-3">
+              <div className="font-semibold mb-2">バックアップ</div>
+              <div className="text-xs opacity-70 mb-2">JSONとして保存/復元できます（端末間の移行に便利）。</div>
+              <div className="flex gap-2 text-sm">
+                <button onClick={doExport} className="px-3 py-2 rounded-xl bg-neutral-100">JSONエクスポート</button>
+                <button onClick={doImport} className="px-3 py-2 rounded-xl bg-emerald-600 text-white">JSONインポート</button>
               </div>
             </div>
           </div>
@@ -690,7 +819,22 @@
             {tab === "ベース" && <BaseEditor bases={bases} setBases={setBases} fyKg={fyKg} />}
             {tab === "メニュー" && <MenuEditor fruits={fruits} fyPerG={fyG} ingredients={ingredients} items={items} setItems={setItems} cat={cat} setCat={setCat} />}
             {tab === "その他" && <IngredientManager ingredients={ingredients} setIngredients={setIngredients} />}
-            {tab === "設定" && <Settings includeShipping={includeShipping} setIncludeShipping={setIncludeShipping} />}
+            {tab === "設定" && (
+              <Settings
+                includeShipping={includeShipping}
+                setIncludeShipping={setIncludeShipping}
+                fruits={fruits}
+                setFruits={setFruits}
+                bases={bases}
+                setBases={setBases}
+                ingredients={ingredients}
+                setIngredients={setIngredients}
+                items={items}
+                setItems={setItems}
+                cat={cat}
+                setCat={setCat}
+              />
+            )}
           </div>
         );
       }
