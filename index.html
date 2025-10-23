@@ -50,23 +50,26 @@
         const get = async (key) => {
           try {
             const db = await openDB();
-            return await new Promise((resolve, reject) => {
+            const idbVal = await new Promise((resolve, reject) => {
               const tx = db.transaction('kv', 'readonly');
               const store = tx.objectStore('kv');
               const req = store.get(key);
               req.onsuccess = () => resolve(req.result ?? null);
               req.onerror = () => reject(req.error || new Error('idb get error'));
             });
+            if (idbVal !== null && idbVal !== undefined) return idbVal;
           } catch {
-            try {
-              const raw = localStorage.getItem(key);
-              return raw ? JSON.parse(raw) : null;
-            } catch {
-              return null;
-            }
+            // ignore, will try localStorage
+          }
+          try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+          } catch {
+            return null;
           }
         };
         const set = async (key, val) => {
+          // Best-effort dual write: IndexedDB and localStorage
           try {
             const db = await openDB();
             await new Promise((resolve, reject) => {
@@ -77,11 +80,12 @@
               req.onerror = () => reject(req.error || new Error('idb set error'));
             });
           } catch {
-            try {
-              localStorage.setItem(key, JSON.stringify(val));
-            } catch {
-              // どちらも失敗した場合は諦める（プライベートブラウズ等）
-            }
+            // ignore IDB failure
+          }
+          try {
+            localStorage.setItem(key, JSON.stringify(val));
+          } catch {
+            // ignore localStorage failure
           }
         };
         return { get, set };
