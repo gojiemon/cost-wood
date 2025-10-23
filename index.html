@@ -3,6 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.webmanifest" />
     <title>原価アプリ（MVP）</title>
     <!-- Tailwind CDN（JIT） -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -865,6 +869,13 @@
       // React 18 の createRoot でマウント
       const root = ReactDOM.createRoot(document.getElementById("root"));
       root.render(<App />);
+
+      // Service Worker registration for PWA/offline & better persistence as a proper Home Screen app
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
       // ===== ここまで =====
     </script>
   </body>
