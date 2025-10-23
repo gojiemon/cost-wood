@@ -731,12 +731,31 @@
               const text = await file.text();
               const obj = JSON.parse(text);
               if (!confirm('バックアップを読み込み、現在のデータを置き換えます。続行しますか？')) return;
-              if (Array.isArray(obj.fruits)) setFruits(obj.fruits);
-              if (Array.isArray(obj.bases)) setBases(obj.bases);
-              if (Array.isArray(obj.ingredients)) setIngredients(obj.ingredients);
-              if (Array.isArray(obj.menus)) setItems(obj.menus);
-              if (typeof obj.menuCat === 'string') setCat(obj.menuCat);
-              if (typeof obj.includeShipping === 'boolean') setIncludeShipping(obj.includeShipping);
+              const newFruits = Array.isArray(obj.fruits) ? obj.fruits : fruits;
+              const newBases = Array.isArray(obj.bases) ? obj.bases : bases;
+              const newIngredients = Array.isArray(obj.ingredients) ? obj.ingredients : ingredients;
+              const newItems = Array.isArray(obj.menus) ? obj.menus : items;
+              const newCat = typeof obj.menuCat === 'string' ? obj.menuCat : cat;
+              const newIncludeShipping = typeof obj.includeShipping === 'boolean' ? obj.includeShipping : includeShipping;
+
+              // 画面状態の更新
+              setFruits(newFruits);
+              setBases(newBases);
+              setIngredients(newIngredients);
+              setItems(newItems);
+              setCat(newCat);
+              setIncludeShipping(newIncludeShipping);
+
+              // 永続化を明示的に実行（iOSで直後終了しても残るように）
+              await Promise.all([
+                storage.set('fruits', newFruits),
+                storage.set('bases', newBases),
+                storage.set('ingredients', newIngredients),
+                storage.set('menus', newItems),
+                storage.set('menuCat', newCat),
+                storage.set('includeShipping', newIncludeShipping)
+              ]);
+
               alert('インポートが完了しました');
             } catch (e) {
               alert('JSONの読み取りに失敗しました');
