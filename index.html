@@ -228,7 +228,7 @@
         const [q, setQ] = useState("");
         const [open, setOpen] = useState(false);
         const [editing, setEditing] = useState(null);
-        const [form, setForm] = useState({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" });
+        const [form, setForm] = useState({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "", blend: "" });
         const list = fruits.filter((f) => `${f.supplier} ${f.fruitName} ${f.variety ?? ""}`.includes(q));
         const toNum = (s) => { const v = Number(s); return isFinite(v) ? v : undefined; };
         // 既定ブレンド量（Sサイズ時の果物g）
@@ -258,8 +258,8 @@
           if (name.includes("いち") || name.includes("苺")) return 35;
           return undefined;
         };
-        const openNew = () => { setEditing(null); setForm({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "" }); setOpen(true); };
-        const openEdit = (f) => { setEditing(f); setForm({ supplier: f.supplier || "", fruitName: f.fruitName || "", variety: f.variety || "", contract: String(f.contractPricePerKg ?? ""), shipTotal: String(f.shippingCostTotal ?? ""), shipKg: String(f.shipmentWeightKg ?? ""), edible: String(f.edibleRatio ?? "") }); setOpen(true); };
+        const openNew = () => { setEditing(null); setForm({ supplier: "", fruitName: "", variety: "", contract: "", shipTotal: "", shipKg: "", edible: "", blend: "" }); setOpen(true); };
+        const openEdit = (f) => { setEditing(f); setForm({ supplier: f.supplier || "", fruitName: f.fruitName || "", variety: f.variety || "", contract: String(f.contractPricePerKg ?? ""), shipTotal: String(f.shippingCostTotal ?? ""), shipKg: String(f.shipmentWeightKg ?? ""), edible: String(f.edibleRatio ?? ""), blend: String(f.blendFruitG ?? "") }); setOpen(true); };
         const save = () => {
           const patch = {
             id: editing?.id ?? uid(),
@@ -269,7 +269,8 @@
             contractPricePerKg: Number(form.contract || 0),
             shippingCostTotal: toNum(form.shipTotal),
             shipmentWeightKg: toNum(form.shipKg),
-            edibleRatio: toNum(form.edible) ?? (EDIBLE_FIXED[form.fruitName] ?? 1)
+            edibleRatio: toNum(form.edible) ?? (EDIBLE_FIXED[form.fruitName] ?? 1),
+            blendFruitG: toNum(form.blend)
           };
           if (editing) {
             setFruits(fruits.map((x) => (x.id === editing.id ? { ...x, ...patch } : x)));
@@ -325,6 +326,20 @@
                   <label>配送重量(kg)<input type="number" className="border rounded-xl p-2 w-full" value={form.shipKg} onChange={(e) => setForm({ ...form, shipKg: e.target.value })} /></label>
                 </div>
                 <label>可食部率(0〜1)<input type="number" step="0.01" className="border rounded-xl p-2 w-full" value={form.edible} onChange={(e) => setForm({ ...form, edible: e.target.value })} /></label>
+                <label>
+                  Sサイズ時の果物g（任意）
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    className="border rounded-xl p-2 w-full"
+                    placeholder={`例: ${(blendDefault({ fruitName: form.fruitName || "", variety: form.variety || "" }) ?? 35)}`}
+                    value={form.blend}
+                    onChange={(e) => setForm({ ...form, blend: e.target.value })}
+                  />
+                  <div className="text-xs opacity-70 mt-1">未入力では銘柄の既定値（該当なしは35g）を使用します。</div>
+                </label>
                 <div className="flex justify-between items-center gap-2 mt-2">
                   {editing && <button onClick={removeItem} className="px-3 py-2 rounded-xl bg-red-600 text-white">削除</button>}
                   <div className="ml-auto flex gap-2">
